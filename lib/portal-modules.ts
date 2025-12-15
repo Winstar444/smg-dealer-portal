@@ -1,26 +1,89 @@
 export const ADMIN_MODULES = [
-  { id: "new-dealer-onboarding", label: "New Dealer Onboarding", route: "/admin/new-dealer-onboarding" },
+  {
+    id: "new-dealer-onboarding",
+    label: "New Dealer Onboarding",
+    route: "/admin/new-dealer-onboarding",
+  },
 
-  // ✅ FIXED ROUTE
-  { id: "labour-chart", label: "Labour Chart List", route: "/admin-dashboard/labour-charts" },
+  // ✅ FIXED IDs + ROUTES (MATCH AdminModulePage)
+  {
+    id: "labour-chart-list",
+    label: "Labour Chart List",
+    route: "/admin/labour-chart-list",
+  },
 
-  { id: "spare-parts", label: "Spare Part List", route: "/admin/spare-part-list" },
-  { id: "new-model", label: "New Model List", route: "/admin/new-model-list" },
-  { id: "roadside-assistance", label: "Road Side Assistance Chart", route: "/admin/roadside-assistance-chart" },
-  { id: "warranty-dates", label: "Warranty Dates", route: "/admin/warranty-dates" },
-  { id: "sales-to-dealer", label: "Sales To Dealer", route: "/admin/sales-to-dealer" },
-  { id: "hsrp-booking", label: "HSRP Booking Confirmation", route: "/admin/hsrp-booking-confirmation" },
-  { id: "training-modules", label: "Service Training Modules", route: "/admin/service-training-modules" },
-  { id: "regional-technicians", label: "Regional Technician List", route: "/admin/regional-technicians" },
-  { id: "training-meetings", label: "Training and Meeting Information", route: "/admin/training-meetings" },
+  {
+    id: "spare-part-list",
+    label: "Spare Part List",
+    route: "/admin/spare-part-list",
+  },
+
+  {
+    id: "new-model-list",
+    label: "New Model List",
+    route: "/admin/new-model-list",
+  },
+
+  {
+    id: "roadside-assistance-chart",
+    label: "Road Side Assistance Chart",
+    route: "/admin/roadside-assistance-chart",
+  },
+
+  {
+    id: "warranty-dates",
+    label: "Warranty Dates",
+    route: "/admin/warranty-dates",
+  },
+
+  {
+    id: "sales-to-dealer",
+    label: "Sales To Dealer",
+    route: "/admin/sales-to-dealer",
+  },
+
+  {
+    id: "hsrp-booking-confirmation",
+    label: "HSRP Booking Confirmation",
+    route: "/admin/hsrp-booking-confirmation",
+  },
+
+  {
+    id: "service-training-modules",
+    label: "Service Training Modules",
+    route: "/admin/service-training-modules",
+  },
+
+  {
+    id: "regional-technicians",
+    label: "Regional Technician List",
+    route: "/admin/regional-technicians",
+  },
+
+  {
+    id: "training-meetings",
+    label: "Training and Meeting Information",
+    route: "/admin/training-meetings",
+  },
+
   {
     id: "government-announcements",
     label: "Government Officials Announcements",
     route: "/admin/government-announcements",
   },
-  { id: "spare-part-orders", label: "Spare Part Order Receiving", route: "/admin/spare-part-orders" },
-  { id: "recall", label: "Recall Option", route: "/admin/recall" },
-];
+
+  {
+    id: "spare-part-orders",
+    label: "Spare Part Order Receiving",
+    route: "/admin/spare-part-orders",
+  },
+
+  {
+    id: "recall",
+    label: "Recall Option",
+    route: "/admin/recall",
+  },
+]
 
 
 export const DEALER_SECTIONS = {

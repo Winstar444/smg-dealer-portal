@@ -339,6 +339,82 @@ router.put("/spare-parts/:id", adminAuth, async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+// ========================================
+// MODELS (ADMIN ONLY)
+// ========================================
+
+// ✅ GET ALL MODELS
+router.get("/models", adminAuth, async (_req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("models")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    return res.status(200).json(data);
+  } catch (err) {
+    console.error("Fetch models error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ✅ CREATE MODEL
+router.post("/models", adminAuth, async (req, res) => {
+  try {
+    const { model_code, model_name, model_type, price } = req.body;
+
+    if (!model_code || !model_name || !model_type || !price) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const { data, error } = await supabase
+      .from("models")
+      .insert([
+        {
+          model_code,
+          model_name,
+          model_type,
+          price,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    return res.status(201).json(data);
+  } catch (err) {
+    console.error("Create model error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ✅ DELETE MODEL
+router.delete("/models/:id", adminAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from("models")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    return res.status(200).json({ message: "Model deleted successfully" });
+  } catch (err) {
+    console.error("Delete model error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 // DELETE SPARE PART
 router.delete("/spare-parts/:id", adminAuth, async (req, res) => {
