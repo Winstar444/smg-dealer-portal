@@ -3,6 +3,12 @@ import { createClient } from "@supabase/supabase-js";
 import "dotenv/config";
 import { adminAuth } from "../middleware/adminAuth";
 import crypto from "crypto";
+import {
+  getGovernmentAnnouncements,
+  addGovernmentAnnouncement,
+  updateGovernmentAnnouncement,
+  deleteGovernmentAnnouncement,
+} from "../controllers/governmentAnnouncement.controller"
 
 const router = Router();
 
@@ -485,5 +491,33 @@ router.post("/events", adminAuth, async (req, res) => {
   if (error) return res.status(500).json({ error: error.message })
   res.json({ message: "Event added" })
 })
+router.get(
+  "/government-announcements",
+  adminAuth,
+  getGovernmentAnnouncements
+)
+router.get(
+  "/government-announcements",
+  adminAuth,
+  getGovernmentAnnouncements
+)
 
-export default router;
+router.post(
+  "/government-announcements",
+  adminAuth,
+  addGovernmentAnnouncement
+)
+
+router.put(
+  "/government-announcements/:id",
+  adminAuth,
+  updateGovernmentAnnouncement
+)
+
+router.delete(
+  "/government-announcements/:id",
+  adminAuth,
+  deleteGovernmentAnnouncement
+)
+
+export default router

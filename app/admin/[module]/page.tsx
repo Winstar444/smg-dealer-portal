@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import LabourChartSection from "@/components/admin/LabourChartSection"
+import GovernmentAnnouncementSection from "@/components/admin/GovernmentAnnouncementSection"
 
 import PortalHeader from "@/components/portal-header"
 import ModuleDetailPage from "@/components/module-detail-page"
@@ -175,15 +176,7 @@ const MODULE_CONTENT: Record<
     description:
       "Publish and manage government official announcements for dealers.",
     sections: [
-      { title: "Active Announcements" },
-      {
-        title: "Key Actions",
-        description: "Post new announcements or updates",
-      },
-      {
-        title: "Announcement Archive",
-        description: "Data table of past announcements (Coming Soon)",
-      },
+      
     ],
   },
 
@@ -258,6 +251,9 @@ export default function AdminModulePage() {
 {module === "new-model-list" && <NewModelListSection />}
 
 {module === "labour-chart-list" && <LabourChartSection />}
+{module === "government-announcements" && (
+  <GovernmentAnnouncementSection />
+)}
 
 
             {/* ✅ PLACEHOLDER MODULES (UNCHANGED) */}
