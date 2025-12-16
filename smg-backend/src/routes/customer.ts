@@ -89,5 +89,22 @@ router.get("/profile/:user_id", async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Server error" });
   }
 });
+router.get("/labour-charts", async (_req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("labour_charts")
+      .select("job_code, job_description, labour_cost, category")
+      .order("category", { ascending: true })
+
+    if (error) {
+      return res.status(500).json({ error: error.message })
+    }
+
+    return res.status(200).json(data)
+  } catch (err) {
+    console.error("Customer labour charts error:", err)
+    return res.status(500).json({ error: "Internal server error" })
+  }
+})
 
 export default router;

@@ -19,16 +19,23 @@ export const adminAuth = async (
       return res.status(401).json({ error: "Missing authorization header" });
     }
 
+    // ✅ STEP 3 — DEMO BYPASS (TEMPORARY)
+    // Allows frontend demo token to pass without real Supabase auth
+    if (authHeader === "Bearer demo-admin-token") {
+      return next();
+    }
+
+    // ⬇️ EXISTING REAL AUTH LOGIC (UNCHANGED)
     const token = authHeader.replace("Bearer ", "");
 
-    // ✅ VERIFY USER WITH SUPABASE
+    // VERIFY USER WITH SUPABASE
     const { data, error } = await supabase.auth.getUser(token);
 
     if (error || !data.user) {
       return res.status(401).json({ error: "Invalid or expired token" });
     }
 
-    // ✅ CHECK ADMIN ROLE
+    // CHECK ADMIN ROLE
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
@@ -39,7 +46,7 @@ export const adminAuth = async (
       return res.status(403).json({ error: "Admin access only" });
     }
 
-    // ✅ AUTH PASSED
+    // AUTH PASSED
     next();
   } catch (err) {
     console.error("Admin auth error:", err);

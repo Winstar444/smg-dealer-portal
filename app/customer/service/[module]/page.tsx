@@ -1,11 +1,18 @@
 "use client"
 
 import { useParams, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import ModuleDetailPage from "@/components/module-detail-page"
 import PlaceholderSection from "@/components/placeholder-section"
 import { CUSTOMER_SECTIONS } from "@/lib/portal-modules"
 import PortalHeader from "@/components/portal-header"
-import { useState } from "react"
+
+interface LabourChart {
+  job_code: string
+  job_description: string
+  labour_cost: number
+  category: string
+}
 
 const SERVICE_CONTENT: Record<
   string,
@@ -15,7 +22,8 @@ const SERVICE_CONTENT: Record<
   }
 > = {
   "live-tracking": {
-    description: "Track your vehicle servicing in real-time and receive service information updates.",
+    description:
+      "Track your vehicle servicing in real-time and receive service information updates.",
     sections: [
       { title: "Service Status", description: "Real-time tracking of your service appointment" },
       { title: "Technician Information", description: "Details about assigned technician" },
@@ -24,74 +32,14 @@ const SERVICE_CONTENT: Record<
   },
   "labour-estimate": {
     description: "View estimated labour charges for your vehicle service.",
-    sections: [
-      { title: "Service Estimate" },
-      { title: "Labor Breakdown", description: "Detailed breakdown of labour charges" },
-      { title: "Estimate History", description: "Data table of previous estimates (Coming Soon)" },
-    ],
+    sections: [{ title: "Service Estimate" }]
   },
   "amc-renewal": {
     description: "Manage and renew your Annual Maintenance Contract.",
     sections: [
-      { title: "AMC Status", description: "Current AMC status and coverage" },
-      { title: "Renewal Options", description: "Available renewal plans" },
-      { title: "Coverage Details", description: "Data table of AMC terms (Coming Soon)" },
-    ],
-  },
-  "road-assistance": {
-    description: "Call for roadside assistance and track emergency support requests.",
-    sections: [
-      { title: "Quick Call", description: "Emergency assistance button" },
-      { title: "Active Requests", description: "Status of current assistance requests" },
-      { title: "Request History", description: "Data table of past calls (Coming Soon)" },
-    ],
-  },
-  "insurance-finance": {
-    description: "Inquire about insurance and financing options for your vehicle.",
-    sections: [
-      { title: "Insurance Information" },
-      { title: "Finance Options", description: "Available financing plans" },
-      { title: "Inquiry Records", description: "Data table of inquiries (Coming Soon)" },
-    ],
-  },
-  "charging-station": {
-    description: "Upcoming feature: Find and locate EV charging stations.",
-    sections: [
-      { title: "Charging Network (Coming Soon)" },
-      { title: "Station Locator", description: "Find nearby charging stations" },
-      { title: "Reservation System", description: "Data table of available stations (Coming Soon)" },
-    ],
-  },
-  "hsrp-info": {
-    description: "View information about your High Security Registration Plate.",
-    sections: [
-      { title: "HSRP Status", description: "Current status and details" },
-      { title: "Application Details" },
-      { title: "HSRP Records", description: "Data table of plate information (Coming Soon)" },
-    ],
-  },
-  "product-enquiry": {
-    description: "Inquire about vehicle models, spare parts, accessories, and merchandise.",
-    sections: [
-      { title: "Model Information" },
-      { title: "Parts & Accessories", description: "Browse and inquire about parts" },
-      { title: "Inquiry Status", description: "Data table of inquiries (Coming Soon)" },
-    ],
-  },
-  events: {
-    description: "Stay updated with upcoming SMG events and activities.",
-    sections: [
-      { title: "Upcoming Events" },
-      { title: "Registration", description: "Register for events" },
-      { title: "Event Calendar", description: "Data table of all events (Coming Soon)" },
-    ],
-  },
-  "resale-request": {
-    description: "Request resale valuation and buyback options for your vehicle.",
-    sections: [
-      { title: "Valuation Request", description: "Submit vehicle for valuation" },
-      { title: "Offer Details", description: "View buyback offers" },
-      { title: "Request History", description: "Data table of valuations (Coming Soon)" },
+      { title: "AMC Status" },
+      { title: "Renewal Options" },
+      { title: "Coverage Details (Coming Soon)" },
     ],
   },
 }
@@ -99,15 +47,36 @@ const SERVICE_CONTENT: Record<
 export default function CustomerServicePage() {
   const params = useParams()
   const module = params.module as string
-  const [currentRole] = useState<"admin" | "dealer" | "customer">("customer")
   const router = useRouter()
 
-  const handleRoleChange = (role: "admin" | "dealer" | "customer") => {
-    router.push(`/${role}-dashboard`)
-  }
+  const [labours, setLabours] = useState<LabourChart[]>([])
+  const [loading, setLoading] = useState(false)
 
   const moduleData = CUSTOMER_SECTIONS.service.find((m) => m.id === module)
-  const content = SERVICE_CONTENT[module] || { description: "Service module details", sections: [] }
+  const content = SERVICE_CONTENT[module] || {
+    description: "Service module details",
+    sections: [],
+  }
+
+  // 🔥 FETCH LABOUR DATA ONLY FOR LABOUR ESTIMATE
+  useEffect(() => {
+    if (module === "labour-estimate") {
+      fetchLabours()
+    }
+  }, [module])
+
+  const fetchLabours = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch("http://localhost:4000/customer/labour-charts")
+      const data = await res.json()
+      setLabours(Array.isArray(data) ? data : [])
+    } catch (err) {
+      console.error("Failed to load labour charts", err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (!moduleData) {
     return <div className="p-8">Module not found</div>
@@ -115,7 +84,7 @@ export default function CustomerServicePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PortalHeader role="Customer" currentRole={currentRole} onRoleChange={handleRoleChange} />
+      <PortalHeader role="customer" />
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <ModuleDetailPage
@@ -130,7 +99,44 @@ export default function CustomerServicePage() {
         >
           <div className="space-y-6">
             {content.sections.map((section, idx) => (
-              <PlaceholderSection key={idx} title={section.title} description={section.description} />
+              <div key={idx}>
+                <PlaceholderSection
+                  title={section.title}
+                  description={section.description}
+                />
+
+                {/* ✅ REAL LABOUR TABLE */}
+                {module === "labour-estimate" && section.title === "Service Estimate" && (
+                  <div className="bg-white border rounded-xl p-6 mt-4">
+                    {loading ? (
+                      <p>Loading...</p>
+                    ) : labours.length === 0 ? (
+                      <p className="text-gray-500">No labour data available</p>
+                    ) : (
+                      <table className="w-full border">
+                        <thead className="bg-gray-100">
+                          <tr>
+                            <th className="p-2 border">Job Code</th>
+                            <th className="p-2 border">Description</th>
+                            <th className="p-2 border">Category</th>
+                            <th className="p-2 border">Estimated Cost (₹)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {labours.map((item, i) => (
+                            <tr key={i} className="text-center">
+                              <td className="p-2 border">{item.job_code}</td>
+                              <td className="p-2 border">{item.job_description}</td>
+                              <td className="p-2 border">{item.category}</td>
+                              <td className="p-2 border">₹{item.labour_cost}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </ModuleDetailPage>

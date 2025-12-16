@@ -33,11 +33,11 @@ export default function LabourChartsPage() {
   // ===============================
   const fetchLabourCharts = async () => {
     try {
-      const token = localStorage.getItem("admin_token");
-
+      const token = localStorage.getItem("admin-token");
 
       if (!token) {
         setError("Admin not logged in");
+        setLoading(false);
         return;
       }
 
@@ -69,7 +69,7 @@ export default function LabourChartsPage() {
   // ===============================
   const handleAddLabour = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("admin-token");
 
       const res = await fetch(
         "http://localhost:4000/admin/labour-charts",
@@ -110,8 +110,7 @@ export default function LabourChartsPage() {
     if (!editingItem) return;
 
     try {
-      const token = localStorage.getItem("admin_token");
-
+      const token = localStorage.getItem("admin-token");
 
       const res = await fetch(
         `http://localhost:4000/admin/labour-charts/${editingItem.id}`,
@@ -148,7 +147,7 @@ export default function LabourChartsPage() {
     if (!confirm("Are you sure you want to delete this labour chart?")) return;
 
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("admin-token");
 
       const res = await fetch(
         `http://localhost:4000/admin/labour-charts/${id}`,
@@ -174,7 +173,7 @@ export default function LabourChartsPage() {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Labour Chart</h1>
 
-      {/* ================= ADD FORM ================= */}
+      {/* ADD FORM */}
       <div className="mb-6 border p-4 rounded">
         <h2 className="font-semibold mb-3">Add Labour Chart</h2>
 
@@ -214,7 +213,7 @@ export default function LabourChartsPage() {
         </button>
       </div>
 
-      {/* ================= TABLE ================= */}
+      {/* TABLE */}
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-600">{error}</p>}
 
@@ -266,7 +265,7 @@ export default function LabourChartsPage() {
         </div>
       )}
 
-      {/* ================= EDIT MODAL ================= */}
+      {/* EDIT MODAL */}
       {editingItem && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="bg-white p-6 rounded w-96">

@@ -22,16 +22,15 @@ export default function LabourChartSection() {
     labour_cost: "",
   })
 
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("adminToken")
-      : null
-
   // =========================
   // FETCH LABOUR CHARTS
   // =========================
   const fetchLabours = async () => {
-    if (!token) return
+    const token = localStorage.getItem("admin-token")
+    if (!token) {
+      setError("Admin not logged in")
+      return
+    }
 
     try {
       setError("")
@@ -41,12 +40,15 @@ export default function LabourChartSection() {
         },
       })
 
-      if (!res.ok) throw new Error("Failed to load labour charts")
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || "Failed to load labour charts")
+      }
 
       const data = await res.json()
       setLabours(Array.isArray(data) ? data : [])
-    } catch (err) {
-      setError("Failed to load labour charts")
+    } catch (err: any) {
+      setError(err.message || "Failed to load labour charts")
     }
   }
 
@@ -58,6 +60,7 @@ export default function LabourChartSection() {
   // ADD LABOUR CHART
   // =========================
   const handleAdd = async () => {
+    const token = localStorage.getItem("admin-token")
     if (!token) return
 
     if (
@@ -70,48 +73,72 @@ export default function LabourChartSection() {
       return
     }
 
-    setLoading(true)
+    try {
+      setLoading(true)
 
-    await fetch("http://localhost:4000/admin/labour-charts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        job_code: form.job_code,
-        job_description: form.job_description,
-        category: form.category,
-        labour_cost: Number(form.labour_cost),
-      }),
-    })
+      const res = await fetch("http://localhost:4000/admin/labour-charts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          job_code: form.job_code,
+          job_description: form.job_description,
+          category: form.category,
+          labour_cost: Number(form.labour_cost),
+        }),
+      })
 
-    setForm({
-      job_code: "",
-      job_description: "",
-      category: "",
-      labour_cost: "",
-    })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || "Failed to add labour chart")
+      }
 
-    fetchLabours()
-    setLoading(false)
+      setForm({
+        job_code: "",
+        job_description: "",
+        category: "",
+        labour_cost: "",
+      })
+
+      fetchLabours()
+    } catch (err: any) {
+      alert(err.message || "Error adding labour chart")
+    } finally {
+      setLoading(false)
+    }
   }
 
   // =========================
   // DELETE LABOUR CHART
   // =========================
   const handleDelete = async (id: string) => {
+    const token = localStorage.getItem("admin-token")
     if (!token) return
+
     if (!confirm("Delete this labour chart?")) return
 
-    await fetch(`http://localhost:4000/admin/labour-charts/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    try {
+      const res = await fetch(
+        `http://localhost:4000/admin/labour-charts/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
 
-    fetchLabours()
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || "Failed to delete")
+      }
+
+      fetchLabours()
+    } catch (err: any) {
+      alert(err.message || "Error deleting labour chart")
+    }
   }
 
   // =========================
