@@ -9,6 +9,30 @@ const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+// ================================
+// ACTIVE MARKETING CAMPAIGNS (CUSTOMER)
+// ================================
+router.get("/marketing-campaigns", async (_req, res) => {
+  try {
+    const today = new Date().toISOString().split("T")[0]
+
+    const { data, error } = await supabase
+      .from("marketing_campaigns")
+      .select("*")
+      .lte("start_date", today)
+      .gte("end_date", today)
+      .order("start_date", { ascending: true })
+
+    if (error) {
+      return res.status(500).json({ error: error.message })
+    }
+
+    return res.status(200).json(data)
+  } catch (err) {
+    console.error("Fetch active campaigns error:", err)
+    return res.status(500).json({ error: "Internal server error" })
+  }
+})
 
 // --------------------------------------------
 // UPDATE CUSTOMER PROFILE

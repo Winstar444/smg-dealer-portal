@@ -5,7 +5,21 @@ export const ADMIN_MODULES = [
     route: "/admin/new-dealer-onboarding",
   },
 
-  // ✅ FIXED IDs + ROUTES (MATCH AdminModulePage)
+  // ❌ WRONG (kept as-is per your instruction)
+  // This points to CUSTOMER route, do not use this going forward
+  {
+    id: "new-campaign",
+    label: "New Campaign (OLD – DO NOT USE)",
+    route: "/customer/marketing/new-campaign",
+  },
+
+  // ✅ CORRECT ADMIN ENTRY (ADDED)
+  {
+    id: "admin-new-campaign",
+    label: "New Campaign",
+    route: "/admin/marketing/new-campaign",
+  },
+
   {
     id: "labour-chart-list",
     label: "Labour Chart List",
@@ -16,6 +30,12 @@ export const ADMIN_MODULES = [
     id: "spare-part-list",
     label: "Spare Part List",
     route: "/admin/spare-part-list",
+  },
+
+  {
+    id: "marketing",
+    label: "Marketing",
+    route: "/admin/marketing",
   },
 
   {
@@ -85,7 +105,6 @@ export const ADMIN_MODULES = [
   },
 ]
 
-
 export const DEALER_SECTIONS = {
   services: [
     { id: "warranty-claim", label: "Warranty Claim", route: "/dealer/services/warranty-claim" },
@@ -101,11 +120,7 @@ export const DEALER_SECTIONS = {
     { id: "amc", label: "AMC", route: "/dealer/services/amc" },
     { id: "hsrp-booking", label: "HSRP Booking", route: "/dealer/services/hsrp-booking" },
     { id: "training", label: "Service Training Modules", route: "/dealer/services/training-modules" },
-    {
-      id: "regional-technicians",
-      label: "Regional Technician Details",
-      route: "/dealer/services/regional-technicians",
-    },
+    { id: "regional-technicians", label: "Regional Technician Details", route: "/dealer/services/regional-technicians" },
     { id: "resale-price", label: "Resale Price", route: "/dealer/services/resale-price" },
     { id: "lead-management", label: "Lead Management", route: "/dealer/services/lead-management" },
   ],

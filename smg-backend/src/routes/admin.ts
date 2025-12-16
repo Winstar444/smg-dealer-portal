@@ -442,6 +442,83 @@ router.delete("/spare-parts/:id", adminAuth, async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+// ================================
+// MARKETING CAMPAIGNS (ADMIN)
+// ================================
+
+// GET ALL CAMPAIGNS
+router.get("/marketing-campaigns", adminAuth, async (_req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("marketing_campaigns")
+      .select("*")
+      .order("created_at", { ascending: false })
+
+    if (error) {
+      return res.status(500).json({ error: error.message })
+    }
+
+    return res.status(200).json(data)
+  } catch (err) {
+    console.error("Fetch campaigns error:", err)
+    return res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// CREATE CAMPAIGN
+router.post("/marketing-campaigns", adminAuth, async (req, res) => {
+  try {
+    const { title, description, start_date, end_date } = req.body
+
+    if (!title || !start_date || !end_date) {
+      return res.status(400).json({ error: "Missing required fields" })
+    }
+
+    const { data, error } = await supabase
+      .from("marketing_campaigns")
+      .insert([
+        {
+          title,
+          description,
+          start_date,
+          end_date,
+        },
+      ])
+      .select()
+      .single()
+
+    if (error) {
+      return res.status(500).json({ error: error.message })
+    }
+
+    return res.status(201).json(data)
+  } catch (err) {
+    console.error("Create campaign error:", err)
+    return res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// DELETE CAMPAIGN
+router.delete("/marketing-campaigns/:id", adminAuth, async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const { error } = await supabase
+      .from("marketing_campaigns")
+      .delete()
+      .eq("id", id)
+
+    if (error) {
+      return res.status(500).json({ error: error.message })
+    }
+
+    return res.status(200).json({ message: "Campaign deleted" })
+  } catch (err) {
+    console.error("Delete campaign error:", err)
+    return res.status(500).json({ error: "Internal server error" })
+  }
+})
+
 // upcoming events
 router.get("/events", adminAuth, async (_req, res) => {
   const today = new Date().toISOString().split("T")[0]

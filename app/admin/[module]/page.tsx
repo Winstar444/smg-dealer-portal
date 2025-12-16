@@ -1,5 +1,5 @@
 "use client"
-
+import MarketingSection from "@/components/admin/MarketingCampaignSection"
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import LabourChartSection from "@/components/admin/LabourChartSection"
@@ -32,6 +32,11 @@ const MODULE_CONTENT: Record<
       },
     ],
   },
+  marketing: {
+        description:
+                      "Create campaigns and manage marketing companies for SMG.",
+                      sections: [],
+},
 
   "labour-chart-list": {
     description:
@@ -244,15 +249,17 @@ export default function AdminModulePage() {
           <div className="space-y-6">
 
             {/* ✅ REAL MODULES (RENDER ONCE) */}
-{module === "new-dealer-onboarding" && <DealerOnboardingSection />}
+      {module === "new-dealer-onboarding" && <DealerOnboardingSection />}
 
-{module === "training-meetings" && <EventManagementSection />}
+      {module === "training-meetings" && <EventManagementSection />}
 
-{module === "new-model-list" && <NewModelListSection />}
+      {module === "new-model-list" && <NewModelListSection />}
 
-{module === "labour-chart-list" && <LabourChartSection />}
-{module === "government-announcements" && (
-  <GovernmentAnnouncementSection />
+      {module === "marketing" && <MarketingSection />}
+
+      {module === "labour-chart-list" && <LabourChartSection />}
+      {module === "government-announcements" && (
+       <GovernmentAnnouncementSection />
 )}
 
 
