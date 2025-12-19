@@ -23,31 +23,32 @@ export default function AdminDashboard() {
     <div className="flex min-h-screen bg-gray-50">
 
       {/* 🔵 LEFT BLUE SIDEBAR */}
-      <aside className="w-64 min-h-screen bg-[#0A1E5A] text-white p-6">
-        <h2 className="text-xl font-bold mb-8">Admin Panel</h2>
+      <aside className="w-64 fixed left-0 top-0 h-screen bg-[#0A1E5A] text-white pt-16 border-r border-[#1E335E]">
 
-        <nav className="space-y-3">
+        {/* Sidebar Title */}
+        <div className="flex items-center px-6 h-14 text-lg font-semibold border-b border-[#1E335E]">
+          Admin Panel
+        </div>
+
+        {/* Sidebar Navigation */}
+        <nav className="mt-1">
           <a
-  href="/admin/marketing"
-  className="block px-4 py-2 rounded hover:bg-[#132E7A]"
->
-  Marketing
-</a>
-
-
-          <a
-            href="/admin-dashboard"
-            className="block px-4 py-2 rounded hover:bg-[#132E7A]"
+            href="/admin/marketing"
+            className="flex items-center px-6 h-14 text-lg cursor-pointer
+                 border-l-4 border-white bg-[#243B6B] font-semibold
+                 hover:bg-[#1E335E]"
           >
+            Marketing
           </a>
         </nav>
-      </aside>
 
+      </aside>
+      
       {/* 🔹 RIGHT SIDE CONTENT (UNCHANGED) */}
       <div className="flex-1">
         <PortalHeader role="Admin Dashboard" />
 
-        <main className="max-w-7xl mx-auto px-6 py-8">
+        <main className="ml-64 max-w-7xl mx-auto px-6 py-8">
           {/* Dashboard Header */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-[#1A2A5A] mb-2">

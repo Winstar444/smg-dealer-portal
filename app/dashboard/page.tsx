@@ -1,20 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import CustomerPortalHeader from "@/components/customer-portal-header";
+import CustomerSidebar from "@/components/CustomerSidebar";
 import ModuleSection from "@/components/module-section";
-import CustomerSidebar from "@/components/customer-sidebar";
 import { CUSTOMER_SECTIONS } from "@/lib/portal-modules";
-
-const SECTION_OPTIONS = [
-  { id: "service", label: "Service" },
-  { id: "technician", label: "Service Technician Tools" },
-  { id: "marketing", label: "Marketing" },
-  { id: "profile", label: "My Profile" },
-];
 
 interface ServiceRequest {
   id: string;
@@ -27,21 +19,28 @@ interface ServiceRequest {
 
 function getStatusClass(status: string) {
   switch (status) {
-    case "pending": return "text-yellow-600 font-semibold";
-    case "accepted": return "text-blue-600 font-semibold";
-    case "in-progress": return "text-indigo-600 font-semibold";
-    case "completed": return "text-green-600 font-semibold";
-    case "cancelled": return "text-red-600 font-semibold";
-    default: return "text-gray-600";
+    case "pending":
+      return "text-yellow-600 font-semibold";
+    case "accepted":
+      return "text-blue-600 font-semibold";
+    case "in-progress":
+      return "text-indigo-600 font-semibold";
+    case "completed":
+      return "text-green-600 font-semibold";
+    case "cancelled":
+      return "text-red-600 font-semibold";
+    default:
+      return "text-gray-600";
   }
 }
 
 export default function CustomerDashboard() {
   const router = useRouter();
 
+  // ✅ KEEP existing section logic
   const [activeSection, setActiveSection] = useState("service");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showBookForm, setShowBookForm] = useState(false);
 
   const [profile, setProfile] = useState({
     full_name: "Demo Customer",
@@ -52,23 +51,20 @@ export default function CustomerDashboard() {
   });
 
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
-
-  const [showBookForm, setShowBookForm] = useState(false);
   const [serviceType, setServiceType] = useState("");
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [description, setDescription] = useState("");
 
-  // 🔐 AUTH PROTECTION + MOCK DATA
+  // 🔐 Auth + mock data
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
 
     if (!token || !userData) {
-      router.push("/customer/login");
+      router.push("/customer-login");
       return;
     }
 
-    // MOCK REQUESTS
     setRequests([
       {
         id: "1",
@@ -88,7 +84,7 @@ export default function CustomerDashboard() {
     ]);
 
     setLoading(false);
-  }, []);
+  }, [router]);
 
   const handleServiceBooking = () => {
     const newRequest: ServiceRequest = {
@@ -102,41 +98,34 @@ export default function CustomerDashboard() {
 
     setRequests((prev) => [newRequest, ...prev]);
     setShowBookForm(false);
-
     setServiceType("");
     setVehicleNumber("");
     setDescription("");
-
     alert("Service booked successfully!");
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header */}
       <CustomerPortalHeader
         userName={profile.full_name}
         userEmail={profile.email}
       />
 
+      {/* ✅ Sidebar added (NO logic coupling) */}
       <CustomerSidebar
-        sections={SECTION_OPTIONS}
         activeSection={activeSection}
         onSectionChange={setActiveSection}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="max-w-6xl mx-auto px-6 py-8">
 
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="mb-6 inline-flex items-center gap-2 px-3 py-2 bg-white border rounded"
-        >
-          <Menu className="w-5 h-5" />
-          Sections
-        </button>
+      {/* ✅ Main content unchanged, only shifted */}
+      <main className="ml-64 max-w-6xl mx-auto px-6 py-8">
+        <h2 className="text-3xl font-semibold mb-6">
+          Customer Dashboard
+        </h2>
 
-        <h2 className="text-3xl font-semibold mb-6">Customer Dashboard</h2>
-
+        {/* SERVICE */}
         {activeSection === "service" && (
           <>
             <button
@@ -146,14 +135,20 @@ export default function CustomerDashboard() {
               + Book New Service
             </button>
 
-            <ModuleSection title="Service" modules={CUSTOMER_SECTIONS.service} />
+            <ModuleSection
+              title="Service"
+              modules={CUSTOMER_SECTIONS.service}
+            />
 
             <div className="mt-8 space-y-4">
               {loading ? (
                 <p>Loading...</p>
               ) : (
                 requests.map((req) => (
-                  <div key={req.id} className="p-4 bg-white rounded shadow">
+                  <div
+                    key={req.id}
+                    className="p-4 bg-white rounded shadow"
+                  >
                     <p><b>Service:</b> {req.service_type}</p>
                     <p><b>Vehicle:</b> {req.vehicle_number}</p>
                     <p>
@@ -162,8 +157,12 @@ export default function CustomerDashboard() {
                         {req.status}
                       </span>
                     </p>
-                    <p><b>Date:</b> {req.created_at.slice(0, 10)}</p>
-                    {req.description && <p><b>Description:</b> {req.description}</p>}
+                    <p>
+                      <b>Date:</b> {req.created_at.slice(0, 10)}
+                    </p>
+                    {req.description && (
+                      <p><b>Description:</b> {req.description}</p>
+                    )}
                   </div>
                 ))
               )}
@@ -171,14 +170,23 @@ export default function CustomerDashboard() {
           </>
         )}
 
+        {/* TECHNICIAN */}
         {activeSection === "technician" && (
-          <ModuleSection title="Service Technician Tools" modules={CUSTOMER_SECTIONS.technician} />
+          <ModuleSection
+            title="Service Technician Tools"
+            modules={CUSTOMER_SECTIONS.technician}
+          />
         )}
 
+        {/* MARKETING */}
         {activeSection === "marketing" && (
-          <ModuleSection title="Marketing" modules={CUSTOMER_SECTIONS.marketing} />
+          <ModuleSection
+            title="Marketing"
+            modules={CUSTOMER_SECTIONS.marketing}
+          />
         )}
 
+        {/* PROFILE */}
         {activeSection === "profile" && (
           <div className="bg-white p-6 rounded shadow space-y-2">
             <p><b>Name:</b> {profile.full_name}</p>
@@ -190,10 +198,13 @@ export default function CustomerDashboard() {
         )}
       </main>
 
+      {/* Book Service Modal (UNCHANGED) */}
       {showBookForm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded w-full max-w-md">
-            <h3 className="text-xl font-semibold mb-4">Book Service</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              Book Service
+            </h3>
 
             <input
               placeholder="Service Type"
@@ -217,7 +228,9 @@ export default function CustomerDashboard() {
             />
 
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowBookForm(false)}>Cancel</button>
+              <button onClick={() => setShowBookForm(false)}>
+                Cancel
+              </button>
               <button
                 onClick={handleServiceBooking}
                 className="bg-[#1A2A5A] text-white px-4 py-2 rounded"
