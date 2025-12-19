@@ -1,53 +1,60 @@
-"use client"
-import { ChevronLeft } from "lucide-react"
+"use client";
 
-interface SidebarProps {
-  sections: Array<{ id: string; label: string }>
-  activeSection: string
-  onSectionChange: (sectionId: string) => void
-  isOpen: boolean
-  onClose: () => void
+import { useRouter } from "next/navigation";
+
+interface DealerSidebarProps {
+  activeSection: string;
+  onSectionChange: (section: string) => void;
 }
 
-export default function DealerSidebar({ sections, activeSection, onSectionChange, isOpen, onClose }: SidebarProps) {
-  const handleSectionClick = (sectionId: string) => {
-    onSectionChange(sectionId)
-    onClose()
-  }
+export default function DealerSidebar({
+  activeSection,
+  onSectionChange,
+}: DealerSidebarProps) {
+  const router = useRouter();
+
+  const itemClass = (id: string) =>
+    `flex items-center px-6 h-14 text-lg cursor-pointer border-l-4 transition ${
+      activeSection === id
+        ? "bg-[#243B6B] border-white font-semibold text-white"
+        : "border-transparent text-white hover:bg-[#1E335E]"
+    }`;
 
   return (
-    <>
-      {isOpen && <div className="fixed inset-0 top-16 z-40 bg-black/20" onClick={onClose} aria-hidden="true" />}
-
-      <aside
-        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-60 bg-[#1A2A5A] text-white shadow-lg overflow-y-auto z-50 transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+    <aside className="w-64 fixed left-0 top-0 h-screen bg-[#0A1F44] text-white pt-16 border-r border-[#1E335E]">
+      {/* Back */}
+      <div
+        onClick={() => router.push("/dealer/dashboard")}
+        className="flex items-center gap-2 px-6 h-14 text-lg font-semibold cursor-pointer
+                   hover:bg-[#1E335E] border-b border-[#1E335E]"
       >
-        <nav className="space-y-0">
-          <button
-            onClick={onClose}
-            className="w-full text-left px-6 py-4 transition-all flex items-center gap-3 border-l-4 border-l-transparent hover:bg-[#0f1a32]"
-          >
-            <ChevronLeft className="w-5 h-5" />
-            <span className="text-lg">Back</span>
-          </button>
+        ← Back
+      </div>
 
-          {sections.map((section) => (
-            <button
-              key={section.id}
-              onClick={() => handleSectionClick(section.id)}
-              className={`w-full text-left px-6 py-4 transition-all flex items-center gap-3 border-l-4 ${
-                activeSection === section.id
-                  ? "bg-[#243050] border-l-white font-bold"
-                  : "border-l-transparent hover:bg-[#0f1a32]"
-              }`}
-            >
-              <span className="text-lg">{section.label}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
-    </>
-  )
+      {/* Menu */}
+      <nav className="mt-1">
+        <div className={itemClass("service")} onClick={() => onSectionChange("service")}>
+          Service
+        </div>
+        <div className={itemClass("sales")} onClick={() => onSectionChange("sales")}>
+          Sales
+        </div>
+        <div className={itemClass("purchase")} onClick={() => onSectionChange("purchase")}>
+          Purchase
+        </div>
+        <div className={itemClass("spare-parts")} onClick={() => onSectionChange("spare-parts")}>
+          Spare Parts
+        </div>
+        <div className={itemClass("feedback")} onClick={() => onSectionChange("feedback")}>
+          Feedback
+        </div>
+        <div className={itemClass("events")} onClick={() => onSectionChange("events")}>
+          Events & Training
+        </div>
+        <div className={itemClass("announcements")} onClick={() => onSectionChange("announcements")}>
+          Announcements
+        </div>
+      </nav>
+    </aside>
+  );
 }

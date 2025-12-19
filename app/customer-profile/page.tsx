@@ -154,7 +154,7 @@ export default function CustomerProfilePage() {
         </div>
 
         <div className="mt-4 text-center">
-          <button onClick={() => router.push("/customer-dashboard")} className="text-sm text-[#1A2A5A] hover:underline">
+          <button onClick={() => router.push("/customer/dashboard")} className="text-sm text-[#1A2A5A] hover:underline">
             Back to Dashboard
           </button>
         </div>

@@ -29,7 +29,7 @@ export default function CustomerLoginPage() {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       alert("Login Successful!");
-      router.push("/customer-dashboard");
+      router.push("/customer/dashboard");
     } else {
       alert(data.error || "Login failed");
     }

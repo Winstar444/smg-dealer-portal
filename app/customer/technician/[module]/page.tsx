@@ -82,11 +82,11 @@ export default function CustomerTechnicianPage() {
           title={moduleData.label}
           description={content.description}
           breadcrumbs={[
-            { label: "Customer", href: "/customer-dashboard" },
+            { label: "Customer", href: "/customer/dashboard" },
             { label: "Service Technician Tools" },
             { label: moduleData.label },
           ]}
-          backHref="/customer-dashboard"
+          backHref="/customer/dashboard"
         >
           <div className="space-y-6">
             {content.sections.map((section, idx) => (

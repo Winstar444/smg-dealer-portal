@@ -26,7 +26,7 @@ export default function UnifiedLoginForm() {
     } else if (emailLower.includes("dealer")) {
       dashboardRoute = "/dealer-dashboard"
     } else if (emailLower.includes("customer")) {
-      dashboardRoute = "/customer-dashboard"
+      dashboardRoute = "/customer/dashboard"
     } else {
       setError("Invalid demo credentials")
       setLoading(false)

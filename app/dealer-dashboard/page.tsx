@@ -37,15 +37,7 @@ export default function DealerDashboard() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="max-w-6xl px-6 py-8">
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="mb-6 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-300 text-[#1A2A5A] hover:bg-gray-50 transition-colors"
-          aria-label="Toggle sidebar"
-        >
-          <Menu className="w-5 h-5" />
-          <span className="text-sm font-medium">Sections</span>
-        </button>
+      <main className="ml-64 max-w-7xl mx-auto px-6 py-8">
 
         <div className="mb-8">
           <h2 className="text-3xl font-semibold text-[#1A2A5A] mb-2">Dealer Dashboard</h2>
