@@ -21,7 +21,7 @@ export default function DealerSidebar({
     }`;
 
   return (
-    <aside className="w-64 fixed left-0 top-0 h-screen bg-[#0A1F44] text-white pt-16 border-r border-[#1E335E]">
+    <aside className="w-64 fixed left-0 top-0 h-screen bg-[#0A1E5A] text-white pt-16 border-r border-[#1E335E]">
       {/* Back */}
       <div
         onClick={() => router.push("/dealer/dashboard")}
