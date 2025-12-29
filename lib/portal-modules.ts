@@ -7,18 +7,7 @@ export const ADMIN_MODULES = [
 
   // ❌ WRONG (kept as-is per your instruction)
   // This points to CUSTOMER route, do not use this going forward
-  {
-    id: "new-campaign",
-    label: "New Campaign (OLD – DO NOT USE)",
-    route: "/customer/marketing/new-campaign",
-  },
-
-  // ✅ CORRECT ADMIN ENTRY (ADDED)
-  {
-    id: "admin-new-campaign",
-    label: "New Campaign",
-    route: "/admin/marketing/new-campaign",
-  },
+  
 
   {
     id: "labour-chart-list",
@@ -31,13 +20,7 @@ export const ADMIN_MODULES = [
     label: "Spare Part List",
     route: "/admin/spare-part-list",
   },
-
-  {
-    id: "marketing",
-    label: "Marketing",
-    route: "/admin/marketing",
-  },
-
+  
   {
     id: "new-model-list",
     label: "New Model List",

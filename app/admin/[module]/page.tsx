@@ -1,4 +1,5 @@
 "use client"
+
 import MarketingSection from "@/components/admin/MarketingCampaignSection"
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
@@ -13,6 +14,7 @@ import DealerOnboardingSection from "@/components/admin/DealerOnboardingSection"
 import EventManagementSection from "@/components/admin/EventManagementSection"
 import NewModelListSection from "@/components/admin/NewModelListSection"
 
+import AdminSidebar from "@/components/admin/admin-sidebar"
 import { ADMIN_MODULES } from "@/lib/portal-modules"
 
 const MODULE_CONTENT: Record<
@@ -32,18 +34,17 @@ const MODULE_CONTENT: Record<
       },
     ],
   },
+
   marketing: {
-        description:
-                      "Create campaigns and manage marketing companies for SMG.",
-                      sections: [],
-},
+    description:
+      "Create campaigns and manage marketing companies for SMG.",
+    sections: [],
+  },
 
   "labour-chart-list": {
     description:
       "Manage labor rates and service charges across all SMG service centers.",
-    sections: [
-      
-    ],
+    sections: [],
   },
 
   "spare-part-list": {
@@ -180,9 +181,7 @@ const MODULE_CONTENT: Record<
   "government-announcements": {
     description:
       "Publish and manage government official announcements for dealers.",
-    sections: [
-      
-    ],
+    sections: [],
   },
 
   "spare-part-orders": {
@@ -233,52 +232,69 @@ export default function AdminModulePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
       <PortalHeader role="Admin" />
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <ModuleDetailPage
-          title={moduleData.label}
-          description={content.description}
-          breadcrumbs={[
-            { label: "Admin", href: "/admin-dashboard" },
-            { label: moduleData.label },
-          ]}
-          backHref="/admin-dashboard"
-        >
-          <div className="space-y-6">
+      <div className="flex min-h-[calc(100vh-4rem)] bg-gray-50">
 
-            {/* ✅ REAL MODULES (RENDER ONCE) */}
-      {module === "new-dealer-onboarding" && <DealerOnboardingSection />}
+        {/* 🔵 SIDEBAR (ONLY ADDED THIS) */}
+        <AdminSidebar />
 
-      {module === "training-meetings" && <EventManagementSection />}
+        {/* 🔹 MAIN CONTENT */}
+        <main className="flex-1 ml-64 max-w-7xl mx-auto px-6 py-8">
 
-      {module === "new-model-list" && <NewModelListSection />}
+          <ModuleDetailPage
+            title={moduleData.label}
+            description={content.description}
+            breadcrumbs={[
+              { label: "Admin", href: "/admin-dashboard" },
+              { label: moduleData.label },
+            ]}
+            backHref="/admin-dashboard"
+          >
+            <div className="space-y-6">
 
-      {module === "marketing" && <MarketingSection />}
+              {/* ✅ REAL MODULES (UNCHANGED) */}
+              {module === "new-dealer-onboarding" && (
+                <DealerOnboardingSection />
+              )}
 
-      {module === "labour-chart-list" && <LabourChartSection />}
-      {module === "government-announcements" && (
-       <GovernmentAnnouncementSection />
-)}
+              {module === "training-meetings" && (
+                <EventManagementSection />
+              )}
 
+              {module === "new-model-list" && (
+                <NewModelListSection />
+              )}
 
-            {/* ✅ PLACEHOLDER MODULES (UNCHANGED) */}
-            {![
-              "new-dealer-onboarding",
-              "training-meetings",
-              "new-model-list",
-            ].includes(module) &&
-              content.sections.map((section, idx) => (
-                <PlaceholderSection
-                  key={idx}
-                  title={section.title}
-                  description={section.description}
-                />
-              ))}
-          </div>
-        </ModuleDetailPage>
-      </main>
-    </div>
+              {module === "marketing" && <MarketingSection />}
+
+              {module === "labour-chart-list" && (
+                <LabourChartSection />
+              )}
+
+              {module === "government-announcements" && (
+                <GovernmentAnnouncementSection />
+              )}
+
+              {/* ✅ PLACEHOLDER MODULES (UNCHANGED) */}
+              {![
+                "new-dealer-onboarding",
+                "training-meetings",
+                "new-model-list",
+              ].includes(module) &&
+                content.sections.map((section, idx) => (
+                  <PlaceholderSection
+                    key={idx}
+                    title={section.title}
+                    description={section.description}
+                  />
+                ))}
+            </div>
+          </ModuleDetailPage>
+
+        </main>
+      </div>
+    </>
   )
 }

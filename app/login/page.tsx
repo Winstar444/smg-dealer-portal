@@ -18,7 +18,8 @@ export default function LoginPage() {
     if (username === "admin@smg.com" && password === "Admin@123") {
       localStorage.setItem("admin-token", "demo-admin-token");
 localStorage.setItem("role", "admin");
-      router.push("/admin-dashboard");
+      // 👇 DEFAULT LANDING = PROFILE
+      router.push("/admin/profile");
       return;
     }
 

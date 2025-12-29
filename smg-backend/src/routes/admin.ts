@@ -91,21 +91,35 @@ router.post("/dealers", adminAuth, async (req: Request, res: Response) => {
     }
 
     // 2️⃣ Insert Dealer Profile
-    const { error: profileError } = await supabase
-      .from("dealer_profiles")
-      .insert({
-        user_id: authUser.user.id,
-        dealer_name,
-        email,
-        phone,
-        location,
-        city,
-        state,
-      });
+const { error: profileError } = await supabase
+  .from("dealer_profiles")
+  .insert({
+    user_id: authUser.user.id,
+    dealer_name,
+    email,
+    phone,
+    location,
+    city,
+    state,
+  });
 
-    if (profileError) {
-      return res.status(400).json({ error: profileError.message });
-    }
+  
+if (profileError) {
+  return res.status(400).json({ error: profileError.message });
+}
+// 3️⃣ Insert role into profiles table
+const { error: roleError } = await supabase
+  .from("profiles")
+  .insert({
+    id: authUser.user.id,
+    email,
+    role: "dealer",
+  });
+
+if (roleError) {
+  return res.status(400).json({ error: roleError.message });
+}
+
 
     return res.status(201).json({
       message: "Dealer created successfully",

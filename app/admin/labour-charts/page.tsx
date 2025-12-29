@@ -1,5 +1,6 @@
 "use client";
 
+import PortalHeader from "@/components/portal-header";
 import { useEffect, useState } from "react";
 
 interface LabourChart {
@@ -11,6 +12,7 @@ interface LabourChart {
 }
 
 export default function LabourChartsPage() {
+
   const [labourCharts, setLabourCharts] = useState<LabourChart[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,305 +30,177 @@ export default function LabourChartsPage() {
     fetchLabourCharts();
   }, []);
 
-  // ===============================
-  // FETCH LABOUR CHARTS
-  // ===============================
   const fetchLabourCharts = async () => {
     try {
       const token = localStorage.getItem("admin-token");
+      if (!token) return;
 
-      if (!token) {
-        setError("Admin not logged in");
-        setLoading(false);
-        return;
-      }
+      const res = await fetch("http://localhost:4000/admin/labour-charts", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      const res = await fetch(
-        "http://localhost:4000/admin/labour-charts",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch labour charts");
-      }
+      if (!res.ok) throw new Error("Failed to fetch labour charts");
 
       const data = await res.json();
       setLabourCharts(data);
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Error loading labour charts");
     } finally {
       setLoading(false);
     }
   };
 
-  // ===============================
-  // ADD LABOUR CHART
-  // ===============================
   const handleAddLabour = async () => {
     try {
       const token = localStorage.getItem("admin-token");
 
-      const res = await fetch(
-        "http://localhost:4000/admin/labour-charts",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            job_code: jobCode,
-            job_description: jobDescription,
-            labour_cost: Number(labourCost),
-            category,
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to add labour chart");
-      }
+      await fetch("http://localhost:4000/admin/labour-charts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          job_code: jobCode,
+          job_description: jobDescription,
+          labour_cost: Number(labourCost),
+          category,
+        }),
+      });
 
       setJobCode("");
       setJobDescription("");
       setLabourCost("");
       setCategory("");
-
       fetchLabourCharts();
-    } catch (err) {
+    } catch {
       alert("Error adding labour chart");
     }
   };
 
-  // ===============================
-  // UPDATE LABOUR CHART
-  // ===============================
   const handleUpdateLabour = async () => {
     if (!editingItem) return;
 
-    try {
-      const token = localStorage.getItem("admin-token");
+    const token = localStorage.getItem("admin-token");
 
-      const res = await fetch(
-        `http://localhost:4000/admin/labour-charts/${editingItem.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            job_code: editingItem.job_code,
-            job_description: editingItem.job_description,
-            labour_cost: editingItem.labour_cost,
-            category: editingItem.category,
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to update labour chart");
+    await fetch(
+      `http://localhost:4000/admin/labour-charts/${editingItem.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editingItem),
       }
+    );
 
-      setEditingItem(null);
-      fetchLabourCharts();
-    } catch (err) {
-      alert("Error updating labour chart");
-    }
+    setEditingItem(null);
+    fetchLabourCharts();
   };
 
-  // ===============================
-  // DELETE LABOUR CHART
-  // ===============================
   const handleDeleteLabour = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this labour chart?")) return;
+    if (!confirm("Delete this labour chart?")) return;
 
-    try {
-      const token = localStorage.getItem("admin-token");
+    const token = localStorage.getItem("admin-token");
 
-      const res = await fetch(
-        `http://localhost:4000/admin/labour-charts/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    await fetch(`http://localhost:4000/admin/labour-charts/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-      if (!res.ok) {
-        throw new Error("Failed to delete labour chart");
-      }
-
-      fetchLabourCharts();
-    } catch (err) {
-      alert("Error deleting labour chart");
-    }
+    fetchLabourCharts();
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Labour Chart</h1>
+    <>
+      {/* ✅ HEADER FIRST */}
+      <PortalHeader role="Labour Charts" />
 
-      {/* ADD FORM */}
-      <div className="mb-6 border p-4 rounded">
-        <h2 className="font-semibold mb-3">Add Labour Chart</h2>
+      <div className="flex min-h-[calc(100vh-4rem)] bg-[#F4F6FA]">
 
-        <div className="grid grid-cols-4 gap-4">
-          <input
-            className="border p-2"
-            placeholder="Job Code"
-            value={jobCode}
-            onChange={(e) => setJobCode(e.target.value)}
-          />
-          <input
-            className="border p-2"
-            placeholder="Description"
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-          />
-          <input
-            className="border p-2"
-            placeholder="Labour Cost"
-            type="number"
-            value={labourCost}
-            onChange={(e) => setLabourCost(e.target.value)}
-          />
-          <input
-            className="border p-2"
-            placeholder="Category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          />
-        </div>
+        {/* 🔵 SIDEBAR */}
+        <aside className="w-64 fixed left-0 top-16 h-[calc(100vh-4rem)] bg-[#0A1E5A] text-white border-r border-[#1E335E] z-40">
 
-        <button
-          onClick={handleAddLabour}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          Add Labour
-        </button>
-      </div>
-
-      {/* TABLE */}
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-red-600">{error}</p>}
-
-      {!loading && !error && (
-        <div className="overflow-x-auto">
-          <table className="w-full border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border p-2">Job Code</th>
-                <th className="border p-2">Description</th>
-                <th className="border p-2">Labour Cost</th>
-                <th className="border p-2">Category</th>
-                <th className="border p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {labourCharts.map((item) => (
-                <tr key={item.id}>
-                  <td className="border p-2">{item.job_code}</td>
-                  <td className="border p-2">{item.job_description}</td>
-                  <td className="border p-2">₹{item.labour_cost}</td>
-                  <td className="border p-2">{item.category}</td>
-                  <td className="border p-2 text-center">
-                    <button
-                      className="text-blue-600 mr-3"
-                      onClick={() => setEditingItem(item)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="text-red-600"
-                      onClick={() => handleDeleteLabour(item.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-
-              {labourCharts.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="text-center p-4 text-gray-500">
-                    No labour charts found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* EDIT MODAL */}
-      {editingItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="bg-white p-6 rounded w-96">
-            <h2 className="font-semibold mb-4">Edit Labour Chart</h2>
-
-            <input
-              className="border p-2 w-full mb-2"
-              value={editingItem.job_code}
-              onChange={(e) =>
-                setEditingItem({ ...editingItem, job_code: e.target.value })
-              }
-            />
-            <input
-              className="border p-2 w-full mb-2"
-              value={editingItem.job_description}
-              onChange={(e) =>
-                setEditingItem({
-                  ...editingItem,
-                  job_description: e.target.value,
-                })
-              }
-            />
-            <input
-              className="border p-2 w-full mb-2"
-              type="number"
-              value={editingItem.labour_cost}
-              onChange={(e) =>
-                setEditingItem({
-                  ...editingItem,
-                  labour_cost: Number(e.target.value),
-                })
-              }
-            />
-            <input
-              className="border p-2 w-full mb-4"
-              value={editingItem.category}
-              onChange={(e) =>
-                setEditingItem({
-                  ...editingItem,
-                  category: e.target.value,
-                })
-              }
-            />
-
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setEditingItem(null)}
-                className="px-4 py-2 border rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdateLabour}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
-              >
-                Save
-              </button>
-            </div>
+          <div className="px-6 h-14 flex items-center font-semibold border-b border-[#1E335E]">
+            Admin Panel
           </div>
-        </div>
-      )}
-    </div>
+
+          <div className="px-6 py-4 border-b border-[#1E335E]">
+            <p className="font-semibold">Admin Name</p>
+            <p className="text-xs text-blue-200">admin@smg.com</p>
+          </div>
+
+          <nav className="mt-2">
+            <a href="/admin/profile" className="block px-6 py-3 hover:bg-[#1E335E]">
+              Profile
+            </a>
+            <a href="/admin-dashboard" className="block px-6 py-3 hover:bg-[#1E335E]">
+              Administrative Modules
+            </a>
+            <a
+              href="/admin/labour-charts"
+              className="block px-6 py-3 bg-[#243B6B] font-semibold"
+            >
+              Labour Charts
+            </a>
+          </nav>
+        </aside>
+
+        {/* 🔹 MAIN CONTENT */}
+        <main className="flex-1 ml-64 p-6">
+
+          <h1 className="text-2xl font-bold mb-6">Labour Chart</h1>
+
+          {/* ADD FORM */}
+          <div className="mb-6 border p-4 rounded bg-white">
+            <h2 className="font-semibold mb-3">Add Labour Chart</h2>
+
+            <div className="grid grid-cols-4 gap-4">
+              <input className="border p-2" placeholder="Job Code" value={jobCode} onChange={(e) => setJobCode(e.target.value)} />
+              <input className="border p-2" placeholder="Description" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} />
+              <input className="border p-2" placeholder="Labour Cost" type="number" value={labourCost} onChange={(e) => setLabourCost(e.target.value)} />
+              <input className="border p-2" placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
+            </div>
+
+            <button onClick={handleAddLabour} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
+              Add Labour
+            </button>
+          </div>
+
+          {/* TABLE */}
+          {loading && <p>Loading...</p>}
+          {error && <p className="text-red-600">{error}</p>}
+
+          {!loading && (
+            <table className="w-full border bg-white">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border p-2">Job Code</th>
+                  <th className="border p-2">Description</th>
+                  <th className="border p-2">Cost</th>
+                  <th className="border p-2">Category</th>
+                  <th className="border p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {labourCharts.map((item) => (
+                  <tr key={item.id}>
+                    <td className="border p-2">{item.job_code}</td>
+                    <td className="border p-2">{item.job_description}</td>
+                    <td className="border p-2">₹{item.labour_cost}</td>
+                    <td className="border p-2">{item.category}</td>
+                    <td className="border p-2">
+                      <button onClick={() => setEditingItem(item)} className="text-blue-600 mr-2">Edit</button>
+                      <button onClick={() => handleDeleteLabour(item.id)} className="text-red-600">Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </main>
+      </div>
+    </>
   );
 }

@@ -1,28 +1,27 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { LogOut } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PortalHeaderProps {
-  role: string
+  role: string;
 }
 
 export default function PortalHeader({ role }: PortalHeaderProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleLogout = () => {
-    // ✅ clear admin session
-    localStorage.removeItem("adminToken")
-
-    // redirect to login
-    router.push("/login")
-  }
+    localStorage.removeItem("role");
+    localStorage.removeItem("admin-token");
+    router.push("/login");
+  };
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="flex items-center justify-between px-6 py-4 shadow-sm">
-        {/* Logo + Role */}
+
+        {/* ✅ LOGO STARTS FROM VERY LEFT */}
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-serif font-bold text-[#1A2A5A]">
             SMG
@@ -33,7 +32,6 @@ export default function PortalHeader({ role }: PortalHeaderProps) {
           </span>
         </div>
 
-        {/* Logout */}
         <Button
           onClick={handleLogout}
           variant="outline"
@@ -43,7 +41,8 @@ export default function PortalHeader({ role }: PortalHeaderProps) {
           <LogOut className="w-4 h-4" />
           Logout
         </Button>
+
       </div>
     </header>
-  )
+  );
 }
