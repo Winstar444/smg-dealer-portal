@@ -13,7 +13,7 @@ export default function PortalHeader({ role }: PortalHeaderProps) {
 
   const handleLogout = () => {
     localStorage.removeItem("role");
-    localStorage.removeItem("admin-token");
+    localStorage.removeItem("admin_token"); // ✅ FIXED
     router.push("/login");
   };
 
@@ -21,7 +21,6 @@ export default function PortalHeader({ role }: PortalHeaderProps) {
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="flex items-center justify-between px-6 py-4 shadow-sm">
 
-        {/* ✅ LOGO STARTS FROM VERY LEFT */}
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-serif font-bold text-[#1A2A5A]">
             SMG

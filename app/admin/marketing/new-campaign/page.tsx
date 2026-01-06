@@ -19,6 +19,7 @@ export default function NewCampaignPage() {
         <main className="flex-1 ml-64 max-w-7xl mx-auto px-6 py-8">
           <NewCampaignSection />
         </main>
+        
 
       </div>
     </>

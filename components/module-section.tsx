@@ -18,9 +18,9 @@ export default function ModuleSection({ title, modules }: ModuleSectionProps) {
   const router = useRouter()
 
   const handleNavigation = (route: string) => {
-    // 🔐 Simple admin auth guard
+    // 🔐 Simple admin auth guard (FIXED KEY)
     if (route.startsWith("/admin")) {
-      const adminToken = localStorage.getItem("adminToken")
+      const adminToken = localStorage.getItem("admin_token") // ✅ FIXED
 
       if (!adminToken) {
         router.push("/admin-login")

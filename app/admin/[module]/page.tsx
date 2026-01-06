@@ -1,4 +1,5 @@
 "use client"
+import SparePartListSection from "@/components/admin/SparePartListSection"
 
 import MarketingSection from "@/components/admin/MarketingCampaignSection"
 import { useState } from "react"
@@ -36,8 +37,7 @@ const MODULE_CONTENT: Record<
   },
 
   marketing: {
-    description:
-      "Create campaigns and manage marketing companies for SMG.",
+    description: "Create campaigns and manage marketing companies for SMG.",
     sections: [],
   },
 
@@ -52,10 +52,7 @@ const MODULE_CONTENT: Record<
       "Maintain comprehensive inventory of spare parts and components.",
     sections: [
       { title: "Inventory Summary" },
-      {
-        title: "Key Actions",
-        description: "Add, edit, or remove parts",
-      },
+      { title: "Key Actions", description: "Add, edit, or remove parts" },
       {
         title: "Parts Database",
         description: "Data table of all spare parts (Coming Soon)",
@@ -237,24 +234,23 @@ export default function AdminModulePage() {
 
       <div className="flex min-h-[calc(100vh-4rem)] bg-gray-50">
 
-        {/* 🔵 SIDEBAR (ONLY ADDED THIS) */}
+        {/* ✅ SIDEBAR */}
         <AdminSidebar />
 
-        {/* 🔹 MAIN CONTENT */}
+        {/* ✅ MAIN CONTENT */}
         <main className="flex-1 ml-64 max-w-7xl mx-auto px-6 py-8">
 
           <ModuleDetailPage
             title={moduleData.label}
             description={content.description}
             breadcrumbs={[
-              { label: "Admin", href: "/admin-dashboard" },
+              { label: "Admin", href: "/admin/admin-dashboard" },
               { label: moduleData.label },
             ]}
-            backHref="/admin-dashboard"
+            backHref="/admin/admin-dashboard"
           >
             <div className="space-y-6">
 
-              {/* ✅ REAL MODULES (UNCHANGED) */}
               {module === "new-dealer-onboarding" && (
                 <DealerOnboardingSection />
               )}
@@ -276,8 +272,10 @@ export default function AdminModulePage() {
               {module === "government-announcements" && (
                 <GovernmentAnnouncementSection />
               )}
+              {module === "spare-part-list" && (
+              <SparePartListSection />
+              )}
 
-              {/* ✅ PLACEHOLDER MODULES (UNCHANGED) */}
               {![
                 "new-dealer-onboarding",
                 "training-meetings",
