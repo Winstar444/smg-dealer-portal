@@ -4,6 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabaseClient";
+
+interface Profile {
+  full_name: string;
+  email: string;
+  phone: string;
+  vehicle_number: string;
+  address: string;
+}
 
 export default function CustomerProfilePage() {
   const router = useRouter();
@@ -11,7 +20,7 @@ export default function CustomerProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = useState<Profile>({
     full_name: "",
     email: "",
     phone: "",
@@ -19,63 +28,85 @@ export default function CustomerProfilePage() {
     address: "",
   });
 
-  // -------------------------------
-  // LOAD PROFILE FROM LOCALSTORAGE + DB
-  // -------------------------------
+  // ---------------------------------------
+  // FETCH PROFILE FROM SUPABASE (SOURCE OF TRUTH)
+  // + STEP 1: SUPABASE CONNECTION TEST
+  // ---------------------------------------
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userData = localStorage.getItem("user");
+    // 🔍 STEP 1: SUPABASE CONNECTION TEST (TEMPORARY)
+    supabase
+      .from("customers")
+      .select("email")
+      .limit(1)
+      .then((res) => {
+        console.log("Supabase connection test:", res);
+      });
 
-    if (!token || !userData) {
+    const email = localStorage.getItem("customer_email");
+
+    if (!email) {
       router.push("/customer-login");
       return;
     }
 
-    const user = JSON.parse(userData);
+    const fetchProfile = async () => {
+      const { data, error } = await supabase
+        .from("customers")
+        .select("full_name, email, phone, vehicle_number, address")
+        .eq("email", email)
+        .single();
 
-    // Set profile fields from backend login response
-    setProfile({
-      full_name: user.full_name,
-      email: user.email,
-      phone: user.phone || "",
-      vehicle_number: user.vehicle_number || "",
-      address: user.address || "",
-    });
+      if (error) {
+        console.error("Failed to fetch profile", error);
+        alert("Unable to load profile");
+        return;
+      }
 
-    setLoading(false);
-  }, []);
+      setProfile({
+        full_name: data.full_name || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        vehicle_number: data.vehicle_number || "",
+        address: data.address || "",
+      });
 
-  // -------------------------------
+      setLoading(false);
+    };
+
+    fetchProfile();
+  }, [router]);
+
+  // ---------------------------------------
   // HANDLE INPUT CHANGE
-  // -------------------------------
-  const handleChange = (e: any) => {
-    setProfile({
-      ...profile,
-      [e.target.name]: e.target.value,
-    });
+  // ---------------------------------------
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
-  // -------------------------------
-  // SAVE PROFILE CHANGES TO BACKEND
-  // -------------------------------
+  // ---------------------------------------
+  // UPDATE PROFILE IN SUPABASE
+  // ---------------------------------------
   const handleSave = async () => {
     setSaving(true);
 
-    const res = await fetch("http://localhost:4000/customer/update-profile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profile),
-    });
+    const email = localStorage.getItem("customer_email");
 
-    const data = await res.json();
+    const { error } = await supabase
+      .from("customers")
+      .update({
+        full_name: profile.full_name,
+        phone: profile.phone,
+        vehicle_number: profile.vehicle_number,
+        address: profile.address,
+      })
+      .eq("email", email);
 
-    if (res.ok) {
-      // Update localStorage
-      localStorage.setItem("user", JSON.stringify(profile));
-
-      alert("Profile updated successfully!");
+    if (error) {
+      alert("Profile update failed");
+      console.error(error);
     } else {
-      alert(data.error || "Update failed");
+      alert("Profile updated successfully!");
     }
 
     setSaving(false);
@@ -84,17 +115,15 @@ export default function CustomerProfilePage() {
   if (loading) return null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#F5F6FA] to-white flex flex-col items-center justify-center px-4">
+    <main className="min-h-screen bg-gradient-to-b from-[#F5F6FA] to-white flex items-center justify-center px-4">
       <div className="rounded-lg p-8 w-full max-w-md shadow-xl bg-white">
-
         <h2 className="text-2xl font-bold text-[#1A2A5A] text-center mb-4">
-          Customer Profile
+          My Profile
         </h2>
 
         <div className="space-y-4">
-
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1">
               Full Name
             </label>
             <Input
@@ -105,14 +134,18 @@ export default function CustomerProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1">
               Email
             </label>
-            <Input name="email" value={profile.email} readOnly className="bg-gray-100" />
+            <Input
+              value={profile.email}
+              readOnly
+              className="bg-gray-100"
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1">
               Phone
             </label>
             <Input
@@ -123,7 +156,7 @@ export default function CustomerProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1">
               Vehicle Number
             </label>
             <Input
@@ -134,7 +167,7 @@ export default function CustomerProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1">
               Address
             </label>
             <Input
@@ -145,20 +178,22 @@ export default function CustomerProfilePage() {
           </div>
 
           <Button
-            className="w-full bg-[#1A2A5A] text-white mt-4"
             onClick={handleSave}
+            disabled={saving}
+            className="w-full bg-[#1A2A5A] text-white mt-4"
           >
             {saving ? "Saving..." : "Save Changes"}
           </Button>
-
         </div>
 
         <div className="mt-4 text-center">
-          <button onClick={() => router.push("/customer/dashboard")} className="text-sm text-[#1A2A5A] hover:underline">
+          <button
+            onClick={() => router.push("/customer/dashboard")}
+            className="text-sm text-[#1A2A5A] hover:underline"
+          >
             Back to Dashboard
           </button>
         </div>
-
       </div>
     </main>
   );

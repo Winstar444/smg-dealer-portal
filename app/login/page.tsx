@@ -8,26 +8,53 @@ import { useState } from "react";
 export default function LoginPage() {
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: any) => {
-    e.preventDefault();
+const handleLogin = async (e: any) => {
+  e.preventDefault();
 
-    // ✅ ADMIN LOGIN (REAL CREDENTIALS)
-    if (username === "admin@smg.com" && password === "Admin@123") {
-     localStorage.setItem("admin_token", "demo-admin-token")
-localStorage.setItem("role", "admin")
+  // ✅ ADMIN LOGIN
+  if (email === "admin@smg.com" && password === "Admin@123") {
+    localStorage.setItem("admin_token", "demo-admin-token");
+    localStorage.setItem("role", "admin");
+    router.push("/admin/profile"); // admin route
+    return;
+  }
 
-      // 👇 DEFAULT LANDING = PROFILE
-      router.push("/admin/profile");
+  try {
+    const res = await fetch("http://localhost:4000/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,        // 👈 backend expects "email"
+        password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Login failed");
       return;
     }
 
-    // ✅ CUSTOMER LOGIN (DEFAULT)
+    // ✅ SAVE SESSION
     localStorage.setItem("role", "customer");
+    localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("access_token", data.session.access_token);
+
+    // ✅ FIXED REDIRECT (THIS WAS THE BUG)
     router.push("/dashboard");
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+};
+
 
   return (
     <div className="min-h-screen w-full flex">
@@ -51,11 +78,12 @@ localStorage.setItem("role", "admin")
           <form onSubmit={handleLogin} className="w-full">
 
             <input
-              type="text"
-              placeholder="email / username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              placeholder="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+              required
             />
 
             <input
@@ -64,6 +92,7 @@ localStorage.setItem("role", "admin")
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded mb-1"
+              required
             />
 
             <Link
@@ -75,9 +104,10 @@ localStorage.setItem("role", "admin")
 
             <button
               type="submit"
-              className="w-full bg-[#0A1E5A] text-white py-2 rounded hover:bg-[#0A1E5A]/90"
+              disabled={loading}
+              className="w-full bg-[#0A1E5A] text-white py-2 rounded hover:bg-[#0A1E5A]/90 disabled:opacity-60"
             >
-              LOGIN
+              {loading ? "Logging in..." : "LOGIN"}
             </button>
           </form>
 

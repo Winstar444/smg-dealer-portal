@@ -100,6 +100,7 @@ router.post("/login", async (req: Request, res: Response) => {
         full_name: profile.full_name,
         role: profile.role,
       },
+      
       session: loginData.session,
     });
   } catch (err) {

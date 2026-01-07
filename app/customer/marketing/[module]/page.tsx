@@ -7,6 +7,7 @@ import ActiveCampaignsSection from "@/components/customer/ActiveCampaignsSection
 import ModuleDetailPage from "@/components/module-detail-page"
 import PlaceholderSection from "@/components/placeholder-section"
 import PortalHeader from "@/components/portal-header"
+import CustomerSidebar from "@/components/CustomerSidebar"
 import { CUSTOMER_SECTIONS } from "@/lib/portal-modules"
 
 const MARKETING_CONTENT: Record<
@@ -85,40 +86,49 @@ export default function CustomerMarketingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* 🔹 FIXED HEADER */}
       <PortalHeader
         role="Customer"
         currentRole={currentRole}
         onRoleChange={handleRoleChange}
       />
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <ModuleDetailPage
-          title={moduleData.label}
-          description={content.description}
-          breadcrumbs={[
-            { label: "Customer", href: "/customer/dashboard" },
-            { label: "Marketing" },
-            { label: moduleData.label },
-          ]}
-          backHref="/customer/dashboard"
-        >
-         <div className="space-y-6">
+      {/* 🔹 LAYOUT WRAPPER */}
+      <div className="flex pt-16">
+        
+        {/* ✅ CUSTOMER SIDEBAR (PERSISTENT) */}
+        <CustomerSidebar />
 
-  {/* ✅ REAL DATA COMPONENTS */}
-  {module === "new-campaign" && <ActiveCampaignsSection />}
+        {/* ✅ MAIN CONTENT (ONLY THIS CHANGES) */}
+        <main className="flex-1 ml-64 max-w-7xl mx-auto px-6 py-8">
+          <ModuleDetailPage
+            title={moduleData.label}
+            description={content.description}
+            breadcrumbs={[
+              { label: "Customer", href: "/customer/dashboard" },
+              { label: "Marketing" },
+              { label: moduleData.label },
+            ]}
+            backHref="/customer/dashboard"
+          >
+            <div className="space-y-6">
 
-  {/* (Optional – keep placeholders for other modules) */}
-  {module !== "new-campaign" &&
-    content.sections.map((section, idx) => (
-      <PlaceholderSection
-        key={idx}
-        title={section.title}
-        description={section.description}
-                />
-              ))}
-          </div>
-        </ModuleDetailPage>
-      </main>
+              {/* ✅ REAL DATA COMPONENTS */}
+              {module === "new-campaign" && <ActiveCampaignsSection />}
+
+              {/* ✅ PLACEHOLDERS (UNCHANGED) */}
+              {module !== "new-campaign" &&
+                content.sections.map((section, idx) => (
+                  <PlaceholderSection
+                    key={idx}
+                    title={section.title}
+                    description={section.description}
+                  />
+                ))}
+            </div>
+          </ModuleDetailPage>
+        </main>
+      </div>
     </div>
   )
 }

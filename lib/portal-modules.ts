@@ -80,6 +80,10 @@ export const ADMIN_MODULES = [
     label: "Spare Part Order Receiving",
     route: "/admin/spare-part-orders",
   },
+{
+  id: "events",
+  label: "Events Information",
+},
 
   {
     id: "recall",

@@ -17,6 +17,14 @@ interface ServiceRequest {
   created_at: string;
 }
 
+interface Profile {
+  full_name: string;
+  email: string;
+  phone: string;
+  vehicle_number: string;
+  address: string;
+}
+
 function getStatusClass(status: string) {
   switch (status) {
     case "pending":
@@ -37,27 +45,21 @@ function getStatusClass(status: string) {
 export default function CustomerDashboard() {
   const router = useRouter();
 
-  // ✅ KEEP existing section logic
   const [activeSection, setActiveSection] = useState("service");
   const [loading, setLoading] = useState(true);
   const [showBookForm, setShowBookForm] = useState(false);
 
-  const [profile, setProfile] = useState({
-    full_name: "Demo Customer",
-    email: "demo@customer.com",
-    phone: "9999999999",
-    vehicle_number: "DL01AB1234",
-    address: "New Delhi, India",
-  });
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [serviceType, setServiceType] = useState("");
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [description, setDescription] = useState("");
 
-  // 🔐 Auth + mock data
+  // 🔐 AUTH + LOAD PROFILE
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    // ✅ FIXED TOKEN KEY
+    const token = localStorage.getItem("access_token");
     const userData = localStorage.getItem("user");
 
     if (!token || !userData) {
@@ -65,6 +67,21 @@ export default function CustomerDashboard() {
       return;
     }
 
+    try {
+      const user = JSON.parse(userData);
+
+      setProfile({
+        full_name: user.full_name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        vehicle_number: user.vehicle_number || "",
+        address: user.address || "",
+      });
+    } catch (err) {
+      console.error("Invalid user data in localStorage");
+    }
+
+    // MOCK DATA (UNCHANGED)
     setRequests([
       {
         id: "1",
@@ -106,99 +123,92 @@ export default function CustomerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <CustomerPortalHeader
-        userName={profile.full_name}
-        userEmail={profile.email}
+        userName={profile?.full_name || ""}
+        userEmail={profile?.email || ""}
       />
 
-      {/* ✅ Sidebar added (NO logic coupling) */}
-      <CustomerSidebar
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-      />
+      <div className="flex pt-16">
+        <CustomerSidebar
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+        />
 
+        <main className="flex-1 ml-64 max-w-6xl mx-auto px-6 py-8 overflow-y-auto">
+          <h2 className="text-3xl font-semibold mb-6">
+            Customer Dashboard
+          </h2>
 
-      {/* ✅ Main content unchanged, only shifted */}
-      <main className="ml-64 max-w-6xl mx-auto px-6 py-8">
-        <h2 className="text-3xl font-semibold mb-6">
-          Customer Dashboard
-        </h2>
+          {activeSection === "service" && (
+            <>
+              <button
+                onClick={() => setShowBookForm(true)}
+                className="mb-4 px-4 py-2 bg-[#1A2A5A] text-white rounded"
+              >
+                + Book New Service
+              </button>
 
-        {/* SERVICE */}
-        {activeSection === "service" && (
-          <>
-            <button
-              onClick={() => setShowBookForm(true)}
-              className="mb-4 px-4 py-2 bg-[#1A2A5A] text-white rounded"
-            >
-              + Book New Service
-            </button>
+              <ModuleSection
+                title="Service"
+                modules={CUSTOMER_SECTIONS.service}
+              />
 
+              <div className="mt-8 space-y-4">
+                {loading ? (
+                  <p>Loading...</p>
+                ) : (
+                  requests.map((req) => (
+                    <div
+                      key={req.id}
+                      className="p-4 bg-white rounded shadow"
+                    >
+                      <p><b>Service:</b> {req.service_type}</p>
+                      <p><b>Vehicle:</b> {req.vehicle_number}</p>
+                      <p>
+                        <b>Status:</b>{" "}
+                        <span className={getStatusClass(req.status)}>
+                          {req.status}
+                        </span>
+                      </p>
+                      <p>
+                        <b>Date:</b> {req.created_at.slice(0, 10)}
+                      </p>
+                      {req.description && (
+                        <p><b>Description:</b> {req.description}</p>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </>
+          )}
+
+          {activeSection === "technician" && (
             <ModuleSection
-              title="Service"
-              modules={CUSTOMER_SECTIONS.service}
+              title="Service Technician Tools"
+              modules={CUSTOMER_SECTIONS.technician}
             />
+          )}
 
-            <div className="mt-8 space-y-4">
-              {loading ? (
-                <p>Loading...</p>
-              ) : (
-                requests.map((req) => (
-                  <div
-                    key={req.id}
-                    className="p-4 bg-white rounded shadow"
-                  >
-                    <p><b>Service:</b> {req.service_type}</p>
-                    <p><b>Vehicle:</b> {req.vehicle_number}</p>
-                    <p>
-                      <b>Status:</b>{" "}
-                      <span className={getStatusClass(req.status)}>
-                        {req.status}
-                      </span>
-                    </p>
-                    <p>
-                      <b>Date:</b> {req.created_at.slice(0, 10)}
-                    </p>
-                    {req.description && (
-                      <p><b>Description:</b> {req.description}</p>
-                    )}
-                  </div>
-                ))
-              )}
+          {activeSection === "marketing" && (
+            <ModuleSection
+              title="Marketing"
+              modules={CUSTOMER_SECTIONS.marketing}
+            />
+          )}
+
+          {activeSection === "profile" && profile && (
+            <div className="bg-white p-6 rounded shadow space-y-2">
+              <p><b>Name:</b> {profile.full_name}</p>
+              <p><b>Email:</b> {profile.email}</p>
+              <p><b>Phone:</b> {profile.phone}</p>
+              <p><b>Vehicle:</b> {profile.vehicle_number}</p>
+              <p><b>Address:</b> {profile.address}</p>
             </div>
-          </>
-        )}
+          )}
+        </main>
+      </div>
 
-        {/* TECHNICIAN */}
-        {activeSection === "technician" && (
-          <ModuleSection
-            title="Service Technician Tools"
-            modules={CUSTOMER_SECTIONS.technician}
-          />
-        )}
-
-        {/* MARKETING */}
-        {activeSection === "marketing" && (
-          <ModuleSection
-            title="Marketing"
-            modules={CUSTOMER_SECTIONS.marketing}
-          />
-        )}
-
-        {/* PROFILE */}
-        {activeSection === "profile" && (
-          <div className="bg-white p-6 rounded shadow space-y-2">
-            <p><b>Name:</b> {profile.full_name}</p>
-            <p><b>Email:</b> {profile.email}</p>
-            <p><b>Phone:</b> {profile.phone}</p>
-            <p><b>Vehicle:</b> {profile.vehicle_number}</p>
-            <p><b>Address:</b> {profile.address}</p>
-          </div>
-        )}
-      </main>
-
-      {/* Book Service Modal (UNCHANGED) */}
       {showBookForm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded w-full max-w-md">

@@ -1,12 +1,33 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function CustomerDashboard() {
+  const router = useRouter();
+
+  // 🔐 AUTH CHECK (MINIMAL + FIXED)
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    const user = localStorage.getItem("user");
+
+    if (!token || !user) {
+      router.push("/customer-login");
+    }
+  }, [router]);
+
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Customer Dashboard</h1>
-        <p className="text-muted-foreground">Manage your vehicle services and inquiries</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          Customer Dashboard
+        </h1>
+        <p className="text-muted-foreground">
+          Manage your vehicle services and inquiries
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -37,7 +58,9 @@ export default function CustomerDashboard() {
                 <span className="text-sm">Ready for Delivery</span>
               </div>
             </div>
-            <Button className="w-full bg-primary hover:bg-primary/90">View Details</Button>
+            <Button className="w-full bg-primary hover:bg-primary/90">
+              View Details
+            </Button>
           </CardContent>
         </Card>
 
@@ -47,7 +70,9 @@ export default function CustomerDashboard() {
             <CardTitle>Labour Charges Estimate</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">View estimated service charges</p>
+            <p className="text-sm text-muted-foreground">
+              View estimated service charges
+            </p>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>Parts</span>
@@ -62,7 +87,9 @@ export default function CustomerDashboard() {
                 <span className="font-semibold">₹4,000</span>
               </div>
             </div>
-            <Button className="w-full bg-primary hover:bg-primary/90">View Details</Button>
+            <Button className="w-full bg-primary hover:bg-primary/90">
+              View Details
+            </Button>
           </CardContent>
         </Card>
 
@@ -72,12 +99,16 @@ export default function CustomerDashboard() {
             <CardTitle>AMC Renewal</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">Annual Maintenance Contract</p>
+            <p className="text-sm text-muted-foreground">
+              Annual Maintenance Contract
+            </p>
             <div className="text-sm space-y-2">
               <p>Current Plan: Gold</p>
               <p>Expiry: Feb 15, 2026</p>
             </div>
-            <Button className="w-full bg-primary hover:bg-primary/90">Renew AMC</Button>
+            <Button className="w-full bg-primary hover:bg-primary/90">
+              Renew AMC
+            </Button>
           </CardContent>
         </Card>
 
@@ -87,8 +118,12 @@ export default function CustomerDashboard() {
             <CardTitle>Road Assistance</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">Emergency roadside support</p>
-            <Button className="w-full bg-primary hover:bg-primary/90">Call Now</Button>
+            <p className="text-sm text-muted-foreground">
+              Emergency roadside support
+            </p>
+            <Button className="w-full bg-primary hover:bg-primary/90">
+              Call Now
+            </Button>
             <Button variant="outline" className="w-full bg-transparent">
               View Information
             </Button>
@@ -101,8 +136,12 @@ export default function CustomerDashboard() {
             <CardTitle>Insurance & Finance Enquiry</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">Check insurance and finance options</p>
-            <Button className="w-full bg-primary hover:bg-primary/90">Raise Request</Button>
+            <p className="text-sm text-muted-foreground">
+              Check insurance and finance options
+            </p>
+            <Button className="w-full bg-primary hover:bg-primary/90">
+              Raise Request
+            </Button>
           </CardContent>
         </Card>
 
@@ -112,7 +151,9 @@ export default function CustomerDashboard() {
             <CardTitle>Charging Station Enquiry</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">Find EV charging stations (Upcoming)</p>
+            <p className="text-sm text-muted-foreground">
+              Find EV charging stations (Upcoming)
+            </p>
             <Button className="w-full" disabled>
               Coming Soon
             </Button>
@@ -125,8 +166,12 @@ export default function CustomerDashboard() {
             <CardTitle>HSRP Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">High Security Registration Plate details</p>
-            <Button className="w-full bg-primary hover:bg-primary/90">View Details</Button>
+            <p className="text-sm text-muted-foreground">
+              High Security Registration Plate details
+            </p>
+            <Button className="w-full bg-primary hover:bg-primary/90">
+              View Details
+            </Button>
           </CardContent>
         </Card>
 
@@ -136,8 +181,12 @@ export default function CustomerDashboard() {
             <CardTitle>Model & Accessories Enquiry</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">Browse models and accessories</p>
-            <Button className="w-full bg-primary hover:bg-primary/90">Explore</Button>
+            <p className="text-sm text-muted-foreground">
+              Browse models and accessories
+            </p>
+            <Button className="w-full bg-primary hover:bg-primary/90">
+              Explore
+            </Button>
           </CardContent>
         </Card>
 
@@ -147,8 +196,12 @@ export default function CustomerDashboard() {
             <CardTitle>Events Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">Upcoming events and promotions</p>
-            <Button className="w-full bg-primary hover:bg-primary/90">View Events</Button>
+            <p className="text-sm text-muted-foreground">
+              Upcoming events and promotions
+            </p>
+            <Button className="w-full bg-primary hover:bg-primary/90">
+              View Events
+            </Button>
           </CardContent>
         </Card>
 
@@ -158,11 +211,15 @@ export default function CustomerDashboard() {
             <CardTitle>Resale Request</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">Get your vehicle resale valuation</p>
-            <Button className="w-full bg-primary hover:bg-primary/90">Request Valuation</Button>
+            <p className="text-sm text-muted-foreground">
+              Get your vehicle resale valuation
+            </p>
+            <Button className="w-full bg-primary hover:bg-primary/90">
+              Request Valuation
+            </Button>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }
