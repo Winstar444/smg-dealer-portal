@@ -12,53 +12,62 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-const handleLogin = async (e: any) => {
-  e.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-  // ✅ ADMIN LOGIN
-  if (email === "admin@smg.com" && password === "Admin@123") {
-    localStorage.setItem("admin_token", "demo-admin-token");
-    localStorage.setItem("role", "admin");
-    router.push("/admin/profile"); // admin route
-    return;
-  }
-
-  try {
-    const res = await fetch("http://localhost:4000/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,        // 👈 backend expects "email"
-        password,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.error || "Login failed");
+    // ✅ HARD ADMIN LOGIN (OPTIONAL)
+    if (email === "admin@smg.com" && password === "Admin@123") {
+      localStorage.setItem("role", "admin");
+      router.push("/admin/profile");
       return;
     }
 
-    // ✅ SAVE SESSION
-    localStorage.setItem("role", "customer");
-    localStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("access_token", data.session.access_token);
+    try {
+      const res = await fetch("http://localhost:4000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-    // ✅ FIXED REDIRECT (THIS WAS THE BUG)
-    router.push("/dashboard");
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
-  }
-};
+      const data = await res.json();
 
+      if (!res.ok) {
+        alert(data.error || "Login failed");
+        setLoading(false);
+        return;
+      }
+
+      // ✅ SAVE SESSION
+      localStorage.setItem("access_token", data.session.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("role", data.user.role);
+
+      // ✅ ROLE-BASED REDIRECT (FIXED PATHS)
+  // ✅ ROLE-BASED REDIRECT (FINAL FIX)
+if (data.user.role === "dealer") {
+  router.push("/dealer-dashboard");
+} else if (data.user.role === "admin") {
+  router.push("/admin/profile");
+} else {
+  router.push("/dashboard"); // ✅ CUSTOMER DASHBOARD (REAL PATH)
+}
+
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full flex">
-
       {/* LEFT PANEL */}
       <div className="w-full md:w-[28%] flex items-center justify-center px-10">
         <div className="w-full max-w-sm text-center">
@@ -99,7 +108,7 @@ const handleLogin = async (e: any) => {
               href="/forgot-password"
               className="text-xs text-blue-600 mb-4 hover:underline block text-left"
             >
-              Forgot your password ?
+              Forgot your password?
             </Link>
 
             <button
@@ -131,7 +140,6 @@ const handleLogin = async (e: any) => {
           priority
         />
       </div>
-
     </div>
   );
 }

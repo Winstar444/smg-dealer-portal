@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 const router = express.Router();
 
 // ----------------------------------------------------
-// SUPABASE ADMIN CLIENT (Uses Service Role Key)
+// SUPABASE ADMIN CLIENT (Service Role Key)
 // ----------------------------------------------------
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -13,7 +13,7 @@ const supabase = createClient(
 );
 
 // ----------------------------------------------------
-// CUSTOMER SIGNUP
+// CUSTOMER SIGNUP (UNCHANGED)
 // ----------------------------------------------------
 router.post("/signup", async (req: Request, res: Response) => {
   try {
@@ -25,11 +25,11 @@ router.post("/signup", async (req: Request, res: Response) => {
       await supabase.auth.admin.createUser({
         email,
         password,
-        email_confirm: true, // Auto confirms
+        email_confirm: true,
       });
 
-    if (authError) {
-      return res.status(400).json({ error: authError.message });
+    if (authError || !authUser.user) {
+      return res.status(400).json({ error: authError?.message });
     }
 
     const user_id = authUser.user.id;
@@ -43,7 +43,7 @@ router.post("/signup", async (req: Request, res: Response) => {
         phone,
         vehicle_number,
         address,
-        role: "customer",
+        role: "customer", // default
       },
     ]);
 
@@ -62,45 +62,53 @@ router.post("/signup", async (req: Request, res: Response) => {
 });
 
 // ----------------------------------------------------
-// CUSTOMER LOGIN
+// LOGIN (CUSTOMER / DEALER / ADMIN)
 // ----------------------------------------------------
 router.post("/login", async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    // 1️⃣ Login using supabase auth
+    // 1️⃣ Authenticate user
     const { data: loginData, error: loginError } =
       await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-    if (loginError) {
-      return res.status(400).json({ error: loginError.message });
+    if (loginError || !loginData.user) {
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const user = loginData.user;
 
-    // 2️⃣ Get customer profile
+    // 2️⃣ Fetch profile STRICTLY by user_id
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("*")
       .eq("user_id", user.id)
       .single();
 
-    if (profileError) {
-      return res.status(400).json({ error: profileError.message });
+    if (profileError || !profile) {
+      return res.status(403).json({ error: "Profile not found" });
     }
 
+    // 🔍 DEBUG LOG (KEEP FOR NOW)
+    console.log(
+      "LOGIN PROFILE:",
+      profile.email,
+      "ROLE:",
+      profile.role
+    );
+
+    // 3️⃣ Return user + role (NO OVERRIDES)
     return res.status(200).json({
       message: "Login successful",
       user: {
         id: user.id,
         email: user.email,
         full_name: profile.full_name,
-        role: profile.role,
+        role: profile.role, // 🔥 DEALER / CUSTOMER / ADMIN
       },
-      
       session: loginData.session,
     });
   } catch (err) {
@@ -110,6 +118,6 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 // ----------------------------------------------------
-// EXPORT ROUTER (MUST BE LAST)
+// EXPORT ROUTER
 // ----------------------------------------------------
 export default router;
