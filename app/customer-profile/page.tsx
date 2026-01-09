@@ -27,6 +27,7 @@ export default function CustomerProfilePage() {
     vehicle_number: "",
     address: "",
   });
+  
 
   // ---------------------------------------
   // FETCH PROFILE FROM SUPABASE (SOURCE OF TRUTH)
@@ -42,7 +43,16 @@ export default function CustomerProfilePage() {
         console.log("Supabase connection test:", res);
       });
 
-    const email = localStorage.getItem("customer_email");
+    const storedUser = localStorage.getItem("user");
+
+    if (!storedUser) {
+      router.push("/customer-login");
+      return;
+    }
+
+    const user = JSON.parse(storedUser);
+    const email = user.email;
+
 
     if (!email) {
       router.push("/customer-login");
@@ -90,7 +100,17 @@ export default function CustomerProfilePage() {
   const handleSave = async () => {
     setSaving(true);
 
-    const email = localStorage.getItem("customer_email");
+    const storedUser = localStorage.getItem("user");
+
+    if (!storedUser) {
+      alert("Session expired");
+      router.push("/customer-login");
+      return;
+    }
+
+    const user = JSON.parse(storedUser);
+    const email = user.email;
+
 
     const { error } = await supabase
       .from("customers")

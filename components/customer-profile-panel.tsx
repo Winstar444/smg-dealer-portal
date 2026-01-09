@@ -47,6 +47,17 @@ export default function CustomerProfilePanel({
   const [lastSavedData, setLastSavedData] = useState(formData)
   const [displayName, setDisplayName] = useState("")
 
+  // 🔥 FIX 2: Sync dashboard data → profile panel form
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      name: userName ?? "",
+      email: userEmail ?? "",
+    }))
+
+    setDisplayName(userName ?? "")
+  }, [userName, userEmail])
+
   useEffect(() => {
     if (!isOpen || !avatarRef?.current || !popupRef.current) return
 
@@ -199,10 +210,10 @@ export default function CustomerProfilePanel({
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleFieldChange("email", e.target.value)}
-                  placeholder="Enter your email address"
-                  className="w-full mt-0.5 px-1.5 py-0.5 border border-gray-300 rounded-md text-xs"
+                  readOnly
+                  className="bg-gray-100 w-full mt-0.5 px-1.5 py-0.5 border border-gray-300 rounded-md text-xs"
                 />
+
               </div>
 
               <div>

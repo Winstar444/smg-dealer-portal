@@ -58,25 +58,25 @@ export default function CustomerDashboard() {
 
   // 🔐 AUTH + LOAD PROFILE
   useEffect(() => {
-    // ✅ FIXED TOKEN KEY
-    const token = localStorage.getItem("access_token");
-    const userData = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
 
-    if (!token || !userData) {
+    if (!token || !storedUser) {
       router.push("/customer-login");
       return;
     }
 
     try {
-      const user = JSON.parse(userData);
+      const user = JSON.parse(storedUser);
 
       setProfile({
-        full_name: user.full_name || "",
+        full_name: user.full_name || user.name || "",
         email: user.email || "",
         phone: user.phone || "",
         vehicle_number: user.vehicle_number || "",
         address: user.address || "",
       });
+
     } catch (err) {
       console.error("Invalid user data in localStorage");
     }
@@ -102,6 +102,7 @@ export default function CustomerDashboard() {
 
     setLoading(false);
   }, [router]);
+
 
   const handleServiceBooking = () => {
     const newRequest: ServiceRequest = {
