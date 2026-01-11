@@ -239,16 +239,16 @@ export default function AdminModulePage() {
 
         {/* ✅ MAIN CONTENT */}
         <main className="flex-1 ml-64 max-w-7xl mx-auto px-6 py-8">
+<ModuleDetailPage
+  title={moduleData.label}
+  description={content.description}
+  breadcrumbs={[
+    { label: "Admin", href: "/admin-dashboard" },
+    { label: moduleData.label },
+  ]}
+  backHref="/admin-dashboard"
+>
 
-          <ModuleDetailPage
-            title={moduleData.label}
-            description={content.description}
-            breadcrumbs={[
-              { label: "Admin", href: "/admin/admin-dashboard" },
-              { label: moduleData.label },
-            ]}
-            backHref="/admin/admin-dashboard"
-          >
             <div className="space-y-6">
 
               {module === "new-dealer-onboarding" && (

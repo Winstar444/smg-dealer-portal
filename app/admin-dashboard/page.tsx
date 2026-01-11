@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -12,29 +11,18 @@ export default function AdminDashboard() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // 🔒 ADMIN PROTECTION
-useEffect(() => {
-  const role = localStorage.getItem("role");
-
-  if (role !== "admin") {
-    router.push("/login");
-    return;
-  }
-}, [router]);
-
+  // Guard moved to app/admin/layout.tsx
 
   return (
     <div className="flex min-h-screen bg-gray-50">
 
       {/* 🔵 LEFT BLUE SIDEBAR */}
-   <aside className="w-64 fixed left-0 top-16 h-[calc(100vh-4rem)] bg-[#0A1E5A] text-white border-r border-[#1E335E] z-40">
+      <aside className="w-64 fixed left-0 top-16 h-[calc(100vh-4rem)] bg-[#0A1E5A] text-white border-r border-[#1E335E] z-40">
 
-        {/* Sidebar Title */}
         <div className="flex items-center px-6 h-14 text-lg font-semibold border-b border-[#1E335E]">
           Admin Panel
         </div>
 
-        {/* 👤 ADMIN PROFILE */}
         <div className="px-6 py-4 border-b border-[#1E335E]">
           <div className="flex items-center gap-3">
             <img
@@ -52,10 +40,7 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* 🔗 SIDEBAR LINKS */}
         <nav className="mt-1">
-
-          {/* PROFILE */}
           <Link
             href="/admin/profile"
             className={`flex items-center px-6 h-14 text-lg cursor-pointer
@@ -66,7 +51,6 @@ useEffect(() => {
             Profile
           </Link>
 
-          {/* ✅ ADMINISTRATIVE MODULES */}
           <Link
             href="/admin-dashboard"
             className={`flex items-center px-6 h-14 text-lg cursor-pointer
@@ -77,7 +61,6 @@ useEffect(() => {
             Administrative Modules
           </Link>
 
-          {/* MARKETING */}
           <Link
             href="/admin/marketing"
             className={`flex items-center px-6 h-14 text-lg cursor-pointer
@@ -87,7 +70,6 @@ useEffect(() => {
           >
             Marketing
           </Link>
-
         </nav>
       </aside>
 

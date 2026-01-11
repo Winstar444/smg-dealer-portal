@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import PortalHeader from "@/components/portal-header";
@@ -9,12 +8,7 @@ import AdminSidebar from "@/components/admin/admin-sidebar";
 export default function AdminProfilePage() {
   const router = useRouter();
 
-  // 🔒 ADMIN PROTECTION
-  useEffect(() => {
-    if (localStorage.getItem("role") !== "admin") {
-      router.push("/login");
-    }
-  }, [router]);
+  // Guard moved to app/admin/layout.tsx
 
   return (
     <div className="min-h-screen bg-[#F4F6FA]">

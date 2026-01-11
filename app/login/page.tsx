@@ -17,11 +17,12 @@ export default function LoginPage() {
     setLoading(true);
 
     // ✅ HARD ADMIN LOGIN (OPTIONAL)
-    if (email === "admin@smg.com" && password === "Admin@123") {
-      localStorage.setItem("role", "admin");
-      router.push("/admin/profile");
-      return;
-    }
+ if (email === "admin@smg.com" && password === "Admin@123") {
+  localStorage.setItem("role", "admin");
+  localStorage.setItem("access_token", "demo-admin-token"); // 👈 ADD THIS
+  router.push("/admin/profile");
+  return;
+}
 
     try {
       const res = await fetch("http://localhost:4000/auth/login", {

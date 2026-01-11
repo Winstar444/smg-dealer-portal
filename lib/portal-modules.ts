@@ -83,6 +83,7 @@ export const ADMIN_MODULES = [
 {
   id: "events",
   label: "Events Information",
+  route: "/admin/events",
 },
 
   {
